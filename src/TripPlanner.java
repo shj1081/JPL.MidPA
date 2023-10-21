@@ -294,7 +294,8 @@ public class TripPlanner implements ActionListener {
 
 	/*
 	 * overrided actionPerformed method from ActionListener interface
-	 * for handling the action events
+	 * for handling the action events except the keypad buttons
+	 * keypad buttons have their own action events in initialize method
 	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
