@@ -18,6 +18,7 @@ public class TripPlanner implements ActionListener {
 	int count; // for storing the number of objects in the arraylist
 	int inputState; // for storing the state of input process to determine the next step
 
+	
 	// for building elements of GUI
 	private JFrame frmTripPlanner;
 	private JLabel PlannerLogo;
@@ -306,24 +307,45 @@ public class TripPlanner implements ActionListener {
 		else if (e.getSource() == enterButton) {
 			if (inputState == 0) {
 				transportList.get(count - 1).setBaseFare(getInputInteger()); // set the base fare of the object
-				inputState = 1; // set the state of input process
+				inputState++; // set the state of input process
 				if (getTransportType() == "Train" || getTransportType() == "Bus") {
-					textDisiplay.setText("Enter fare per station (for extra stations): "); 
+					textDisiplay.setText("Enter fare per station (for extra stations): ");
 
 				} else {
-					textDisiplay.setText("Enter fare per km: "); 
+					textDisiplay.setText("Enter fare per km: ");
 				}
 			}
 
 			else if (inputState == 1) {
+				inputState++;
 				if (getTransportType() == "Train") {
 					// set the fare per station of the object using Typecasting
 					((Train) transportList.get(count - 1)).stationInfo.setFarePerStation(getInputInteger());
+					textDisiplay.setText("Enter number of stations: ");
 				} else if (getTransportType() == "Bus") {
 					((Bus) transportList.get(count - 1)).stationInfo.setFarePerStation(getInputInteger());
+					textDisiplay.setText("Enter number of stations: ");
+				} else {
+					((Taxi) transportList.get(count - 1)).setFarePerKm(getInputInteger());
+					textDisiplay.setText("Enter distance (in km): ");
 				}
+			} 
+			
+			else if (inputState == 2) {
+				inputState++;
+				if (getTransportType() == "Train") {
+					((Train) transportList.get(count - 1)).stationInfo.setNStation(getInputInteger());
+				} else if (getTransportType() == "Bus") {
+					((Bus) transportList.get(count - 1)).stationInfo.setNStation(getInputInteger());
+				} else {
+					((Taxi) transportList.get(count - 1)).setDistance(getInputInteger());
+				}
+				textDisiplay.setText("Add more transport (from right menu)?");
 			}
+
 		}
+
+
 	}
 
 	/*
