@@ -13,4 +13,11 @@ public class Train extends PublicTransport {
         // TODO: calculate total fare according to the # of stations
         setTotalFare(getBaseFare());
     }
+
+    // getters and setters
+    public Station getStationInfo() {
+        return stationInfo;
+    }
+
+    
 }

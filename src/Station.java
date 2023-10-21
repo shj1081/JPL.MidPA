@@ -7,4 +7,13 @@ public class Station {
     public double getFarePerStation() {
         return farePerStation;
     }
+    public void setFarePerStation(double farePerStation) {
+        this.farePerStation = farePerStation;
+    }
+    public int getNStation() {
+        return nStation;
+    }
+    public void setNStation(int nStation) {
+        this.nStation = nStation;
+    }
 }

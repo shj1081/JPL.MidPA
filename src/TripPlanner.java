@@ -12,12 +12,11 @@ import java.awt.GridLayout;
 import javax.swing.JButton;
 import javax.swing.SwingConstants;
 
-public class TripPlanner {
+public class TripPlanner implements ActionListener {
 
 	ArrayList<PublicTransport> transportList = new ArrayList<PublicTransport>(); // for listing objects of transport
 	int count; // for storing the number of objects in the arraylist
 	int inputState; // for storing the state of input process to determine the next step
-	String transportState; // for storing the state of transport to distinguish the type of transport
 
 	// for building elements of GUI
 	private JFrame frmTripPlanner;
@@ -53,7 +52,7 @@ public class TripPlanner {
 	private JPanel keypadPadding;
 
 	// using WindowBuilder to build the GUI
-	// main function : lunch the application
+	// main method : lunch the application
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -96,7 +95,7 @@ public class TripPlanner {
 
 		// area that display the output text
 		textDisiplay = new JTextArea();
-		textDisiplay.setFont(new Font("Lucida Grande", Font.PLAIN,9));	
+		textDisiplay.setFont(new Font("Lucida Grande", Font.PLAIN, 9));
 		textDisiplay.setEditable(false);
 		textDisiplay.setBounds(157, 131, 246, 182);
 		textDisiplay.setText("Choose transport (from left menu): "); // initial text
@@ -110,16 +109,44 @@ public class TripPlanner {
 
 		trainButton = new JButton("TRAIN");
 		trainButton.setIcon(new ImageIcon(TripPlanner.class.getResource("/assets/train.png")));
+		trainButton.addActionListener(this);
 		TransportPanel.add(trainButton);
 
 		busButton = new JButton("BUS");
 		busButton.setIcon(new ImageIcon(TripPlanner.class.getResource("/assets/bus.png")));
+		busButton.addActionListener(this);
 		TransportPanel.add(busButton);
 
 		taxiButton = new JButton("TAXI");
 		taxiButton.setIcon(new ImageIcon(TripPlanner.class.getResource("/assets/taxi.png")));
+		taxiButton.addActionListener(this);
 		TransportPanel.add(taxiButton);
 
+		// Cancel, Clear, Enter buttons
+		inputControlPanel = new JPanel();
+		inputControlPanel.setBounds(403, 314, 120, 251);
+		frmTripPlanner.getContentPane().add(inputControlPanel);
+		inputControlPanel.setLayout(new GridLayout(4, 1, 0, 0));
+
+		cancelButton = new JButton("CANCEL");
+		cancelButton.setIcon(new ImageIcon(TripPlanner.class.getResource("/assets/cancel.png")));
+		cancelButton.setFont(new Font("Lucida Grande", Font.PLAIN, 9));
+		cancelButton.addActionListener(this);
+		inputControlPanel.add(cancelButton);
+
+		clearButton = new JButton("CLEAR");
+		clearButton.setIcon(new ImageIcon(TripPlanner.class.getResource("/assets/clear.png")));
+		clearButton.setFont(new Font("Lucida Grande", Font.PLAIN, 9));
+		clearButton.addActionListener(this);
+		inputControlPanel.add(clearButton);
+
+		enterButton = new JButton("ENTER");
+		enterButton.setIcon(new ImageIcon(TripPlanner.class.getResource("/assets/enter.png")));
+		enterButton.setFont(new Font("Lucida Grande", Font.PLAIN, 9));
+		enterButton.addActionListener(this);
+		inputControlPanel.add(enterButton);
+
+		// Yes, No buttons
 		yesNoPanel = new JPanel();
 		yesNoPanel.setBounds(403, 131, 120, 87);
 		frmTripPlanner.getContentPane().add(yesNoPanel);
@@ -132,33 +159,6 @@ public class TripPlanner {
 		noButton = new JButton("NO");
 		noButton.setIcon(new ImageIcon(TripPlanner.class.getResource("/assets/cancelSmall.png")));
 		yesNoPanel.add(noButton);
-
-
-		// Cancel, Clear, Enter buttons
-		inputControlPanel = new JPanel();
-		inputControlPanel.setBounds(403, 314, 120, 251);
-		frmTripPlanner.getContentPane().add(inputControlPanel);
-		inputControlPanel.setLayout(new GridLayout(4, 1, 0, 0));
-
-		cancelButton = new JButton("CANCEL");
-		cancelButton.setIcon(new ImageIcon(TripPlanner.class.getResource("/assets/cancel.png")));
-		cancelButton.setFont(new Font("Lucida Grande", Font.PLAIN, 9));
-		inputControlPanel.add(cancelButton);
-
-		clearButton = new JButton("CLEAR");
-		clearButton.setIcon(new ImageIcon(TripPlanner.class.getResource("/assets/clear.png")));
-		clearButton.setFont(new Font("Lucida Grande", Font.PLAIN, 9));
-		clearButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				textDisiplay.setText("");
-			}
-		});
-		inputControlPanel.add(clearButton);
-
-		enterButton = new JButton("ENTER");
-		enterButton.setIcon(new ImageIcon(TripPlanner.class.getResource("/assets/enter.png")));
-		enterButton.setFont(new Font("Lucida Grande", Font.PLAIN, 9));
-		inputControlPanel.add(enterButton);
 
 		// keypad
 		keypadPannel = new JPanel();
@@ -259,5 +259,91 @@ public class TripPlanner {
 		});
 		keypadPannel.add(keypad0);
 
+	}
+
+	/*
+	 * overrided method from ActionListener interface
+	 * for handling the action events
+	 */
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if (e.getSource() == trainButton) {
+			PublicTransport train = new Train(); // create new object of Train
+			transportList.add(train); // add the object to the arraylist
+			count++; // increase the number of objects in the arraylist
+			textDisiplay.setText("You choose TRAIN\nEnter base fare: "); // display the text
+			inputState = 0; // set the state of input process
+		}
+
+		else if (e.getSource() == busButton) {
+			PublicTransport bus = new Bus(); // create new object of Bus
+			transportList.add(bus); // add the object to the arraylist
+			count++; // increase the number of objects in the arraylist
+			textDisiplay.setText("You choose BUS\nEnter base fare: "); // display the text
+			inputState = 0; // set the state of input process
+		}
+
+		else if (e.getSource() == taxiButton) {
+			PublicTransport taxi = new Taxi(); // create new object of Taxi
+			transportList.add(taxi); // add the object to the arraylist
+			count++; // increase the number of objects in the arraylist
+			textDisiplay.setText("You choose TAXI\nEnter base fare: "); // display the text
+			inputState = 0; // set the state of input process
+		}
+
+		else if (e.getSource() == clearButton) {
+			// clear only the input integer number of text area
+			String cleanText = textDisiplay.getText().replaceAll("[0-9]", "");
+			textDisiplay.setText(cleanText);
+		}
+
+		else if (e.getSource() == cancelButton) {
+			transportList.clear(); // clear the arraylist
+			count = 0; // reset the number of objects in the arraylist
+			textDisiplay.setText("Cancelled!\nNew plan:\nChoose transport (from left menu): "); // display the text
+		}
+
+		else if (e.getSource() == enterButton) {
+			if (inputState == 0) {
+				transportList.get(count - 1).setBaseFare(getInputInteger()); // set the base fare of the object
+				inputState = 1; // set the state of input process
+				if (getTransportType() == "Train" || getTransportType() == "Bus") {
+					textDisiplay.setText("Enter fare per station (for extra stations): "); 
+
+				} else {
+					textDisiplay.setText("Enter fare per km: "); 
+				}
+			}
+
+			else if (inputState == 1) {
+				if (getTransportType() == "Train") {
+					// set the fare per station of the object using Typecasting
+					((Train) transportList.get(count - 1)).stationInfo.setFarePerStation(getInputInteger());
+				} else if (getTransportType() == "Bus") {
+					((Bus) transportList.get(count - 1)).stationInfo.setFarePerStation(getInputInteger());
+				}
+			}
+		}
+	}
+
+	/*
+	 * method for getting the input integer number from text area
+	 */
+	public int getInputInteger() {
+		return Integer.parseInt(textDisiplay.getText().replaceAll("[^0-9]", ""));
+	}
+
+	/*
+	 * method for getting boolean value according to the current transport type
+	 * return class name of the object
+	 */
+	public String getTransportType() {
+		if (transportList.get(count - 1) instanceof Train) {
+			return "Train";
+		} else if (transportList.get(count - 1) instanceof Bus) {
+			return "Bus";
+		} else {
+			return "Taxi";
+		}
 	}
 }

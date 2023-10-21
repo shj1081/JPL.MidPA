@@ -1,5 +1,5 @@
 
-public class PublicTransport implements Payable {
+public abstract class PublicTransport implements Payable {
     private String model;
     private double baseFare;
     private double totalFare;
@@ -24,7 +24,7 @@ public class PublicTransport implements Payable {
     }
 
     public void setBaseFare(double baseFare) {
-        baseFare = baseFare;
+        this.baseFare = baseFare;
     }
 
     public double getTotalFare() {
@@ -35,8 +35,5 @@ public class PublicTransport implements Payable {
         this.totalFare = totalFare;
     }
 
-    @Override // from PublicTransport
-    public void calculatePayment() {
-        // TODO: calculate total fare according to the # of stations
-    }
+    public abstract void calculatePayment();
 }
