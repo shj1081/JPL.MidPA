@@ -1,11 +1,17 @@
-
+/*
+ * class Taxi : 
+ *  - child class of PublicTransport
+ */
 public class Taxi extends PublicTransport {
     private double farePerKm;
     private double distance;
 
     // constructor
-    public Taxi() {
-        setModel("KAKAO TAXI");
+    public Taxi(double baseFare, double farePerKm, double distance) {
+        super(baseFare);
+        super.setModel("KAKAO TAXI");
+        setFarePerKm(farePerKm);
+        setDistance(distance);
     }
 
     // getters and setters
@@ -27,6 +33,6 @@ public class Taxi extends PublicTransport {
 
     @Override // from PublicTransport
     public void calculatePayment() {
-        setTotalFare(getBaseFare() + (getFarePerKm() * getDistance()));
+        super.setTotalFare(super.getBaseFare() + (getFarePerKm() * getDistance()));
     }
 }

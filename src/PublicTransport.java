@@ -1,13 +1,18 @@
 
+/*
+ * abstract class PublicTransport : 
+ *  - parent class of Bus, Taxi, Train
+ *  - implements Payable interface
+ */
 public abstract class PublicTransport implements Payable {
     private String model;
     private double baseFare;
     private double totalFare;
 
     // constructor
-    public PublicTransport() {
-        baseFare = 0;
-        totalFare = 0;
+    public PublicTransport(double baseFare) {
+        setModel(""); // default model : empty string
+        setBaseFare(baseFare);
     }
 
     // getters and setters

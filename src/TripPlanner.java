@@ -12,13 +12,29 @@ import java.awt.GridLayout;
 import javax.swing.JButton;
 import javax.swing.SwingConstants;
 
+/*
+ * class TripPlanner : 
+ *  - main class for Trip Planner application
+ *  - implements ActionListener for handling the action events
+ */
 public class TripPlanner implements ActionListener {
 
 	ArrayList<PublicTransport> transportList = new ArrayList<PublicTransport>(); // for listing objects of transport
 	int count; // for storing the number of objects in the arraylist
-	int inputState; // for storing the state of input process to determine the next step
+	int inputState; // for storing the state of input process to determine the next step (state = 0, 1, 2, 3)
+	String currentTransport; // for storing the current transport type
 
-	
+	// for storing user inputs for each object's attributes
+	double baseFare;
+	double farePerStation;
+	int nStation;
+	double farePerKm;
+	double distance;
+
+	// for storing the information of output text
+	String outString = ""; // for storing the output text
+	double totalTripFare = 0; // for storing the total trip fare
+
 	// for building elements of GUI
 	private JFrame frmTripPlanner;
 	private JLabel PlannerLogo;
@@ -53,7 +69,11 @@ public class TripPlanner implements ActionListener {
 	private JPanel keypadPadding;
 
 	// using WindowBuilder to build the GUI
-	// main method : lunch the application
+	
+	/*
+	 * main method : lunch the Trip Planner application
+	 * EventQueue.invokeLater : for thread safety
+	 */
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -155,10 +175,12 @@ public class TripPlanner implements ActionListener {
 
 		yesButton = new JButton("YES");
 		yesButton.setIcon(new ImageIcon(TripPlanner.class.getResource("/assets/enterSmall.png")));
+		yesButton.addActionListener(this);
 		yesNoPanel.add(yesButton);
 
 		noButton = new JButton("NO");
 		noButton.setIcon(new ImageIcon(TripPlanner.class.getResource("/assets/cancelSmall.png")));
+		noButton.addActionListener(this);
 		yesNoPanel.add(noButton);
 
 		// keypad
@@ -263,35 +285,51 @@ public class TripPlanner implements ActionListener {
 	}
 
 	/*
-	 * overrided method from ActionListener interface
+	 * method for getting the input integer number from text area
+	 * used in enterButton action event
+	 */
+	public int getInputInteger() {
+		return Integer.parseInt(textDisiplay.getText().replaceAll("[^0-9]", ""));
+	}
+
+	/*
+	 * overrided actionPerformed method from ActionListener interface
 	 * for handling the action events
 	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
+
+		/*
+		 * trainButton : set the current transport type to "Train", display the text for input process
+		 * busButton : set the current transport type to "Bus", display the text for input process
+		 * taxiButton : set the current transport type to "Taxi", display the text for input process
+		 * all buttons set the state of input process to 0
+		 */
 		if (e.getSource() == trainButton) {
-			PublicTransport train = new Train(); // create new object of Train
-			transportList.add(train); // add the object to the arraylist
-			count++; // increase the number of objects in the arraylist
-			textDisiplay.setText("You choose TRAIN\nEnter base fare: "); // display the text
-			inputState = 0; // set the state of input process
+			currentTransport = "Train";
+			textDisiplay.setText("You choose TRAIN\nEnter base fare: ");
+			inputState = 0; 
 		}
 
 		else if (e.getSource() == busButton) {
-			PublicTransport bus = new Bus(); // create new object of Bus
-			transportList.add(bus); // add the object to the arraylist
-			count++; // increase the number of objects in the arraylist
-			textDisiplay.setText("You choose BUS\nEnter base fare: "); // display the text
-			inputState = 0; // set the state of input process
+			currentTransport = "Bus";
+			textDisiplay.setText("You choose BUS\nEnter base fare: ");
+			inputState = 0;
 		}
 
 		else if (e.getSource() == taxiButton) {
-			PublicTransport taxi = new Taxi(); // create new object of Taxi
-			transportList.add(taxi); // add the object to the arraylist
-			count++; // increase the number of objects in the arraylist
-			textDisiplay.setText("You choose TAXI\nEnter base fare: "); // display the text
-			inputState = 0; // set the state of input process
+			currentTransport = "Taxi";
+			textDisiplay.setText("You choose TAXI\nEnter base fare: "); 
+			inputState = 0;
 		}
-
+		
+		/*
+		 * clearButton : clear the input integer number of text area
+		 * cancelButton : reset all variables and clear the arraylist for new plan
+		 * enterButton : 
+		 * 		- get the input integer number from text area and store it to the corresponding variable
+		 * 		- after getting all info, create the object of public transport based on the current transport type & user input
+		 */
 		else if (e.getSource() == clearButton) {
 			// clear only the input integer number of text area
 			String cleanText = textDisiplay.getText().replaceAll("[0-9]", "");
@@ -301,71 +339,83 @@ public class TripPlanner implements ActionListener {
 		else if (e.getSource() == cancelButton) {
 			transportList.clear(); // clear the arraylist
 			count = 0; // reset the number of objects in the arraylist
+			inputState = 0; // reset the state of input process
+			outString = ""; // reset the output text
+			totalTripFare = 0; // reset the total trip fare
 			textDisiplay.setText("Cancelled!\nNew plan:\nChoose transport (from left menu): "); // display the text
 		}
 
 		else if (e.getSource() == enterButton) {
+			// when inputState is 0, consider the case that not choose the transport type yet
 			if (inputState == 0) {
-				transportList.get(count - 1).setBaseFare(getInputInteger()); // set the base fare of the object
-				inputState++; // set the state of input process
-				if (getTransportType() == "Train" || getTransportType() == "Bus") {
+				baseFare = getInputInteger(); // get the input integer number from text area
+				if (currentTransport == "Train" || currentTransport == "Bus") {
+					inputState++; // update the state of input process
 					textDisiplay.setText("Enter fare per station (for extra stations): ");
-
-				} else {
+				} else if (currentTransport == "Taxi") {
+					inputState++; // update the state of input process
 					textDisiplay.setText("Enter fare per km: ");
 				}
 			}
 
 			else if (inputState == 1) {
 				inputState++;
-				if (getTransportType() == "Train") {
-					// set the fare per station of the object using Typecasting
-					((Train) transportList.get(count - 1)).stationInfo.setFarePerStation(getInputInteger());
-					textDisiplay.setText("Enter number of stations: ");
-				} else if (getTransportType() == "Bus") {
-					((Bus) transportList.get(count - 1)).stationInfo.setFarePerStation(getInputInteger());
+				if (currentTransport == "Train" || currentTransport == "Bus") {
+					farePerStation = getInputInteger();
 					textDisiplay.setText("Enter number of stations: ");
 				} else {
-					((Taxi) transportList.get(count - 1)).setFarePerKm(getInputInteger());
+					farePerKm = getInputInteger();
 					textDisiplay.setText("Enter distance (in km): ");
 				}
-			} 
-			
+			}
+
 			else if (inputState == 2) {
 				inputState++;
-				if (getTransportType() == "Train") {
-					((Train) transportList.get(count - 1)).stationInfo.setNStation(getInputInteger());
-				} else if (getTransportType() == "Bus") {
-					((Bus) transportList.get(count - 1)).stationInfo.setNStation(getInputInteger());
+				count++; // update the number of objects in the arraylist
+				if (currentTransport == "Train") {
+					nStation = getInputInteger();
+					// create the object of public transport based on the current transport type & user input
+					PublicTransport trainObj = new Train(baseFare, farePerStation, nStation);
+					transportList.add(trainObj); // add the object to the arraylist
+
+				} else if (currentTransport == "Bus") {
+					nStation = getInputInteger();
+					PublicTransport busObj = new Bus(baseFare, farePerStation, nStation);
+					transportList.add(busObj);
 				} else {
-					((Taxi) transportList.get(count - 1)).setDistance(getInputInteger());
+					distance = getInputInteger();
+					PublicTransport taxiObj = new Taxi(baseFare, farePerKm, distance);
+					transportList.add(taxiObj);
 				}
 				textDisiplay.setText("Add more transport (from right menu)?");
 			}
-
+		}
+		
+		/*
+		 * yesButton : reset the inputState & display the text for choosing new transport type
+		 * noButton : calculate the total fare for each object, calculate the total trip fare, display the output text
+		 * two buttons are only available when inputState is 3
+		 */
+		else if (e.getSource() == yesButton) {
+			if (inputState == 3) {
+				inputState = 0;
+				textDisiplay.setText("Choose transport (from left menu): ");
+			}
 		}
 
-
-	}
-
-	/*
-	 * method for getting the input integer number from text area
-	 */
-	public int getInputInteger() {
-		return Integer.parseInt(textDisiplay.getText().replaceAll("[^0-9]", ""));
-	}
-
-	/*
-	 * method for getting boolean value according to the current transport type
-	 * return class name of the object
-	 */
-	public String getTransportType() {
-		if (transportList.get(count - 1) instanceof Train) {
-			return "Train";
-		} else if (transportList.get(count - 1) instanceof Bus) {
-			return "Bus";
-		} else {
-			return "Taxi";
+		else if (e.getSource() == noButton) {
+			if (inputState == 3) {
+				for (int i = 0; i < count; i++) {
+					transportList.get(i).calculatePayment(); // calculate the total fare for each object
+					totalTripFare = totalTripFare + transportList.get(i).getTotalFare(); // calculate the total trip fare
+					outString = outString
+							+ ("Transport" + (i + 1) + ": " + transportList.get(i).getModel() + "\n" + "Fare: "
+									+ String.format("%.2f", transportList.get(i).getTotalFare()) + "\n");
+				}
+				outString = outString + ("===========================\n"
+						+ "Total Trip Fare: " + String.format("%.2f", totalTripFare) + "\n");
+				textDisiplay.setText(outString);
+			}
 		}
 	}
 }

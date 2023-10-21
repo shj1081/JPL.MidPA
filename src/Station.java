@@ -1,4 +1,7 @@
-
+/*
+ * class Station
+ *  - used by Bus and Train for calculating fare
+ */
 public class Station {
     private double farePerStation;
     private int nStation;
